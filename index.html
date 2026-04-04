@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scanner Industrial de Extintores</title>
+    <script src="https://unpkg.com/html5-qrcode"></script>
+    <style>
+        :root { --rojo-industrial: #d32f2f; --gris-oscuro: #333; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 450px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        h2 { color: var(--rojo-industrial); margin-top: 0; text-align: center; }
+        #reader { width: 100%; border-radius: 10px; overflow: hidden; border: 2px solid #ddd; margin-bottom: 20px; }
+        .form-group { display: flex; flex-direction: column; gap: 15px; }
+        label { font-weight: bold; color: var(--gris-oscuro); font-size: 0.9em; }
+        input, select { padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1em; background: #fafafa; }
+        input[readonly] { background: #eee; cursor: not-allowed; }
+        button { background: var(--rojo-industrial); color: white; padding: 15px; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: background 0.3s; margin-top: 10px; }
+        button:active { background: #b71c1c; transform: scale(0.98); }
+        .footer { margin-top: 20px; font-size: 0.8em; color: #888; text-align: center; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Control de Extintores</h2>
+    
+    <div id="reader"></div>
+
+    <div class="form-group">
+        <label>ID DEL EXTINTOR (Escanea el código)</label>
+        <input type="text" id="id-extintor" placeholder="Esperando escaneo..." readonly>
+
+        <label>TIPO DE EXTINTOR</label>
+        <select id="tipo">
+            <option value="PQS">PQS (Polvo Químico Seco)</option>
+            <option value="CO2">CO2 (Dióxido de Carbono)</option>
+            <option value="Agua">Agua / Espuma</option>
+            <option value="Tipo K">Tipo K (Cocinas)</option>
+        </select>
+
+        <label>ESTADO FÍSICO</label>
+        <select id="estado">
+            <option value="Operativo">🟢 OPERATIVO</option>
+            <option value="Mantenimiento">🟡 MANTENIMIENTO</option>
+            <option value="Vencido">🔴 VENCIDO / RECARGA</option>
+            <option value="Dañado">⚠️ DAÑADO / SIN PRESIÓN</option>
+        </select>
+
+        <button onclick="enviarDatos()">REGISTRAR INSPECCIÓN</button>
+    </div>
+    
+    <div class="footer">Sistema de Gestión Industrial v1.0</div>
+</div>
+
+<script>
+    // 1. Configurar y arrancar el escáner
+    const html5QrcodeScanner = new Html5QrcodeScanner(
+        "reader", { fps: 15, qrbox: {width: 250, height: 250} }
+    );
+
+    html5QrcodeScanner.render(onScanSuccess);
+
+    function onScanSuccess(decodedText, decodedResult) {
+        document.getElementById('id-extintor').value = decodedText;
+        // Sonido o vibración de éxito (opcional)
+        if (navigator.vibrate) navigator.vibrate(100);
+    }
+
+    // 2. Función para mandar los datos a Google Sheets
+    async function enviarDatos() {
+        const id = document.getElementById('id-extintor').value;
+        const tipo = document.getElementById('tipo').value;
+        const estado = document.getElementById('estado').value;
+        
+        // --- PEGA AQUÍ TU URL DE GOOGLE APPS SCRIPT ---
+        const urlScript = "https://script.google.com/macros/s/AKfycbzXcbkGup0KtRuZRmMo3-TbzJh5vQiX0XKlnmQYJ26qmuvLun_6IxRnhOGGm8RdrVCv/exec"; 
+
+        if (!id) {
+            alert("Por favor, escanea primero el código QR del extintor.");
+            return;
+        }
+
+        const datos = {
+            id: id,
+            tipo: tipo,
+            estado: estado
+        };
+
+        try {
+            // Cambiamos el texto del botón mientras envía
+            const btn = document.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = "ENVIANDO...";
+            btn.disabled = true;
+
+            await fetch(urlScript, {
+                method: "POST",
+                mode: "no-cors", 
+                body: JSON.stringify(datos)
+            });
+
+            alert("✅ Registro guardado en la nube.");
+            
+            // Limpiar formulario para el siguiente
+            document.getElementById('id-extintor').value = "";
+            btn.innerText = originalText;
+            btn.disabled = false;
+
+        } catch (error) {
+            alert("❌ Error de conexión: " + error);
+        }
+    }
+</script>
+
+</body>
+</html>
