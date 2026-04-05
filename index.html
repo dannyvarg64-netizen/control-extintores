@@ -3,53 +3,100 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NOM-002 Auditor Pro</title>
+    <title>NOM-002 Auditor Pro v6 - Seguridad Total</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        :root { --primary: #b71c1c; --secondary: #455a64; --bg: #f5f7f9; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
+        :root { --primary: #b71c1c; --secondary: #455a64; --bg: #f5f7f9; --lock: #1b5e20; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         .app-container { max-width: 500px; margin: auto; background: white; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); overflow: hidden; }
-        header { background: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 1.2rem; }
+        header { background: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 1.1rem; }
         
-        /* Sección Scanner */
-        #reader { width: 100% !important; border: none !important; background: #000; }
-        #reader__scan_region { background: white; }
-        
+        .scanner-section { background: #000; min-height: 50px; position: relative; }
+        #reader { width: 100% !important; border: none !important; display: none; }
+        .camera-controls { padding: 15px; display: flex; justify-content: center; background: #263238; }
+        .btn-camera { background: #fff; color: #263238; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 0 #999; }
+        .btn-camera:active { box-shadow: none; transform: translateY(2px); }
+
         .form-content { padding: 20px; }
         label { display: block; margin-top: 15px; font-weight: 700; font-size: 0.85rem; color: var(--secondary); text-transform: uppercase; }
+        
+        /* Estilo para el campo Protegido */
+        .id-protegido { 
+            background: #e8f5e9; 
+            border: 2px solid var(--lock) !important; 
+            color: var(--lock); 
+            font-weight: bold; 
+            text-align: center;
+            letter-spacing: 1px;
+        }
+
         input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #cfd8dc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         
-        /* Checklist Estilo Industrial */
-        .checklist-group { background: #fff8f1; border: 1px solid #ffe0b2; border-radius: 10px; padding: 15px; margin-top: 15px; }
-        .check-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
-        .check-item:last-child { border: none; }
-        input[type="checkbox"] { width: 22px; height: 22px; cursor: pointer; accent-color: var(--primary); }
+        .row { display: flex; gap: 10px; margin-top: 5px; }
+        .col { flex: 1; }
+        .capacidad-input { display: flex; align-items: center; gap: 5px; }
 
-        /* Contenedor de Firma */
-        .signature-container { border: 2px solid #999; background: #fff; border-radius: 8px; margin-top: 10px; position: relative; }
-        #sig-canvas { width: 100%; height: 160px; touch-action: none; cursor: crosshair; }
-        .sig-tools { display: flex; justify-content: flex-end; padding: 5px; background: #f1f1f1; }
+        .checklist-group { background: #fff8f1; border: 1px solid #ffe0b2; border-radius: 10px; padding: 15px; margin-top: 15px; }
+        .check-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #eee; }
+        input[type="checkbox"] { width: 24px; height: 24px; accent-color: var(--primary); }
+
+        .signature-container { border: 2px solid #999; background: #fff; border-radius: 8px; margin-top: 10px; }
+        #sig-canvas { width: 100%; height: 160px; touch-action: none; }
         
-        .btn-submit { background: var(--primary); color: white; border: none; width: 100%; padding: 18px; border-radius: 10px; font-size: 1.1rem; font-weight: bold; margin-top: 25px; cursor: pointer; box-shadow: 0 4px 6px rgba(183, 28, 28, 0.3); }
-        .btn-submit:active { transform: translateY(2px); box-shadow: none; }
+        .btn-submit { background: var(--primary); color: white; border: none; width: 100%; padding: 18px; border-radius: 10px; font-size: 1.1rem; font-weight: bold; margin-top: 25px; cursor: pointer; }
+        .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
     </style>
 </head>
 <body>
 
 <div class="app-container">
-    <header>SISTEMA DE AUDITORÍA NOM-002</header>
+    <header>AUDITORÍA NOM-002: REGISTRO BLINDADO</header>
     
-    <div id="reader"></div>
+    <div class="scanner-section">
+        <div id="reader"></div>
+        <div class="camera-controls">
+            <button type="button" id="btnStartCamera" class="btn-camera" onclick="startScanner()">
+                📷 ESCANEAR QR OBLIGATORIO
+            </button>
+            <button type="button" id="btnStopCamera" class="btn-camera" onclick="stopScanner()" style="display:none; background:#ffcdd2; color:#b71c1c;">
+                ⏹️ CANCELAR LECTURA
+            </button>
+        </div>
+    </div>
 
     <form id="mainForm" class="form-content">
-        <label>ID del Extintor</label>
-        <input type="text" id="extId" name="extId" placeholder="Escanee QR para comenzar" readonly required>
+        <label>ID Verificado (Solo Escaneo)</label>
+        <input type="text" id="extId" name="extId" class="id-protegido" placeholder="SIN VERIFICAR" readonly required>
 
-        <label>Responsable (Firma)</label>
-        <input type="text" id="responsable" name="responsable" placeholder="Nombre del inspector" required>
+        <div class="row">
+            <div class="col">
+                <label>Agente</label>
+                <select id="tipoAgente" required>
+                    <option value="">-- Tipo --</option>
+                    <option value="PQS">PQS</option>
+                    <option value="CO2">CO2</option>
+                    <option value="Agua">Agua</option>
+                    <option value="Agente Limpio">Agente Limpio</option>
+                    <option value="K">Clase K</option>
+                </select>
+            </div>
+            <div class="col">
+                <label>Capacidad</label>
+                <div class="capacidad-input">
+                    <input type="number" id="capacidad" step="0.1" placeholder="Ej. 6" required>
+                    <select id="unidad">
+                        <option value="kg">kg</option>
+                        <option value="L">L</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <label>Responsable de Inspección</label>
+        <input type="text" id="responsable" placeholder="Nombre completo" required>
 
         <label>Evidencia de Foto</label>
-        <input type="file" id="foto" name="foto" accept="image/*" capture="camera" required>
+        <input type="file" id="foto" accept="image/*" capture="camera" required>
 
         <div class="checklist-group">
             <strong>Checklist Normativo STPS:</strong>
@@ -60,61 +107,92 @@
             <div class="check-item"><span>Acceso libre obstáculos</span><input type="checkbox" id="c5" checked></div>
         </div>
 
+        <label>Observaciones</label>
+        <textarea id="observaciones" placeholder="Hallazgos técnicos..."></textarea>
+
         <label>Estado Final</label>
-        <select id="status" name="status">
-            <option value="Aprobado">✅ Aprobado / Operativo</option>
-            <option value="Observación">⚠️ Observación Menor</option>
-            <option value="Rechazado">❌ Rechazado (Fuera de norma)</option>
+        <select id="status">
+            <option value="Aprobado">✅ Aprobado</option>
+            <option value="Observación">⚠️ Observación</option>
+            <option value="Rechazado">❌ Rechazado</option>
         </select>
 
-        <label>Firma Autógrafa</label>
+        <label>Firma</label>
         <div class="signature-container">
             <canvas id="sig-canvas"></canvas>
-            <div class="sig-tools">
-                <button type="button" onclick="clearSig()" style="font-size:11px; padding:4px 8px;">BORRAR FIRMA</button>
+            <div style="text-align:right; padding:5px; background:#eee;">
+                <button type="button" onclick="clearSig()" style="font-size:10px;">LIMPIAR</button>
             </div>
         </div>
 
-        <button type="submit" class="btn-submit" id="btnEnviar">REGISTRAR INSPECCIÓN</button>
+        <button type="submit" class="btn-submit" id="btnEnviar">ENVIAR REPORTE OFICIAL</button>
     </form>
 </div>
 
 <script>
-    // 1. Configuración del Scanner
-    const scanner = new Html5QrcodeScanner("reader", { fps: 15, qrbox: 250 });
-    scanner.render((text) => {
-        document.getElementById('extId').value = text;
-        window.navigator.vibrate(100);
-    });
+    let html5QrCode;
 
-    // 2. Lógica de Firma
+    async function startScanner() {
+        document.getElementById('reader').style.display = 'block';
+        document.getElementById('btnStartCamera').style.display = 'none';
+        document.getElementById('btnStopCamera').style.display = 'flex';
+
+        html5QrCode = new Html5Qrcode("reader");
+        const config = { fps: 20, qrbox: { width: 250, height: 250 } };
+
+        try {
+            await html5QrCode.start({ facingMode: "environment" }, config, (text) => {
+                document.getElementById('extId').value = text;
+                // Feedback táctil y visual
+                window.navigator.vibrate(200);
+                stopScanner(); 
+            });
+        } catch (err) {
+            alert("Error de cámara: " + err);
+            stopScanner();
+        }
+    }
+
+    async function stopScanner() {
+        if (html5QrCode) {
+            await html5QrCode.stop();
+            html5QrCode = null;
+        }
+        document.getElementById('reader').style.display = 'none';
+        document.getElementById('btnStartCamera').style.display = 'flex';
+        document.getElementById('btnStopCamera').style.display = 'none';
+    }
+
+    // Lógica de Firma
     const canvas = document.getElementById('sig-canvas');
     const ctx = canvas.getContext('2d');
     let drawing = false;
-
-    // Ajustar resolución del canvas
-    canvas.width = canvas.offsetWidth;
-    canvas.height = canvas.offsetHeight;
-
-    function getMousePos(e) {
-        const rect = canvas.getBoundingClientRect();
-        const clientX = e.clientX || e.touches[0].clientX;
-        const clientY = e.clientY || e.touches[0].clientY;
-        return { x: clientX - rect.left, y: clientY - rect.top };
-    }
-
-    canvas.addEventListener('touchstart', (e) => { drawing = true; ctx.beginPath(); const pos = getMousePos(e); ctx.moveTo(pos.x, pos.y); e.preventDefault(); });
-    canvas.addEventListener('touchmove', (e) => { if(!drawing) return; const pos = getMousePos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); e.preventDefault(); });
-    canvas.addEventListener('touchend', () => drawing = false);
+    canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
     
+    canvas.addEventListener('touchstart', (e) => { drawing = true; ctx.beginPath(); });
+    canvas.addEventListener('touchmove', (e) => { 
+        if(!drawing) return;
+        const rect = canvas.getBoundingClientRect();
+        ctx.lineTo(e.touches[0].clientX - rect.left, e.touches[0].clientY - rect.top);
+        ctx.stroke();
+        e.preventDefault();
+    });
+    canvas.addEventListener('touchend', () => drawing = false);
     function clearSig() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
-    // 3. Envío de Datos (Conversión a Base64 para Foto y Firma)
+    // Envío de Datos
     document.getElementById('mainForm').addEventListener('submit', async (e) => {
         e.preventDefault();
+        
+        // Verificación extra de ID
+        if(document.getElementById('extId').value === "SIN VERIFICAR" || !document.getElementById('extId').value) {
+            alert("DEBE ESCANEAR UN QR PARA PODER ENVIAR");
+            return;
+        }
+
         const btn = document.getElementById('btnEnviar');
         btn.disabled = true;
-        btn.innerText = "PROCESANDO AUDITORÍA...";
+        btn.innerText = "CERTIFICANDO REGISTRO...";
 
         const file = document.getElementById('foto').files[0];
         const reader = new FileReader();
@@ -122,7 +200,10 @@
         reader.onloadend = async () => {
             const payload = {
                 id: document.getElementById('extId').value,
+                agente: document.getElementById('tipoAgente').value,
+                capacidad: document.getElementById('capacidad').value + " " + document.getElementById('unidad').value,
                 resp: document.getElementById('responsable').value,
+                obs: document.getElementById('observaciones').value,
                 status: document.getElementById('status').value,
                 firma: canvas.toDataURL('image/png'),
                 foto: reader.result,
@@ -130,25 +211,16 @@
                 timestamp: new Date().toLocaleString()
             };
 
-            // AQUÍ PEGAS TU URL DE GOOGLE APPS SCRIPT
             const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw7AJrzavjTkYTw14mKI06qjNEvVPexFFY9J985aH-yNe249B4map5nCjRMi65O1Cro/exec';
 
             try {
-                await fetch(WEB_APP_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify(payload)
-                });
-                alert("REGISTRO DE AUDITORÍA GUARDADO CORRECTAMENTE");
+                await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+                alert("REGISTRO CERTIFICADO EXITOSAMENTE");
                 location.reload();
-            } catch (err) {
-                alert("Error de conexión. Intente de nuevo.");
-                btn.disabled = false;
-            }
+            } catch (err) { alert("Error"); btn.disabled = false; }
         };
         reader.readAsDataURL(file);
     });
 </script>
-
 </body>
 </html>
