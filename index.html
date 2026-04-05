@@ -3,32 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>NOM-002 Auditor Pro v6 - Seguridad Total</title>
+    <title>NOM-002 Auditor Pro v7 - Ultra Fast</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
         :root { --primary: #b71c1c; --secondary: #455a64; --bg: #f5f7f9; --lock: #1b5e20; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 10px; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); margin: 0; padding: 10px; }
         .app-container { max-width: 500px; margin: auto; background: white; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); overflow: hidden; }
-        header { background: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 1.1rem; }
+        header { background: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold; }
         
+        /* Controles de Cámara */
         .scanner-section { background: #000; min-height: 50px; position: relative; }
         #reader { width: 100% !important; border: none !important; display: none; }
         .camera-controls { padding: 15px; display: flex; justify-content: center; background: #263238; }
-        .btn-camera { background: #fff; color: #263238; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 0 #999; }
-        .btn-camera:active { box-shadow: none; transform: translateY(2px); }
+        .btn-camera { background: #fff; color: #263238; border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; display: flex; align-items: center; gap: 10px; }
 
         .form-content { padding: 20px; }
         label { display: block; margin-top: 15px; font-weight: 700; font-size: 0.85rem; color: var(--secondary); text-transform: uppercase; }
         
-        /* Estilo para el campo Protegido */
-        .id-protegido { 
-            background: #e8f5e9; 
-            border: 2px solid var(--lock) !important; 
-            color: var(--lock); 
-            font-weight: bold; 
-            text-align: center;
-            letter-spacing: 1px;
-        }
+        .id-protegido { background: #e8f5e9; border: 2px solid var(--lock) !important; color: var(--lock); font-weight: bold; text-align: center; }
 
         input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #cfd8dc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
         
@@ -50,23 +42,19 @@
 <body>
 
 <div class="app-container">
-    <header>AUDITORÍA NOM-002: REGISTRO BLINDADO</header>
+    <header>AUDITORÍA NOM-002: ALTA VELOCIDAD</header>
     
     <div class="scanner-section">
         <div id="reader"></div>
         <div class="camera-controls">
-            <button type="button" id="btnStartCamera" class="btn-camera" onclick="startScanner()">
-                📷 ESCANEAR QR OBLIGATORIO
-            </button>
-            <button type="button" id="btnStopCamera" class="btn-camera" onclick="stopScanner()" style="display:none; background:#ffcdd2; color:#b71c1c;">
-                ⏹️ CANCELAR LECTURA
-            </button>
+            <button type="button" id="btnStartCamera" class="btn-camera" onclick="startScanner()">📷 ESCANEAR QR</button>
+            <button type="button" id="btnStopCamera" class="btn-camera" onclick="stopScanner()" style="display:none; background:#ffcdd2; color:#b71c1c;">⏹️ DETENER</button>
         </div>
     </div>
 
     <form id="mainForm" class="form-content">
-        <label>ID Verificado (Solo Escaneo)</label>
-        <input type="text" id="extId" name="extId" class="id-protegido" placeholder="SIN VERIFICAR" readonly required>
+        <label>ID Verificado</label>
+        <input type="text" id="extId" name="extId" class="id-protegido" placeholder="ESCANEE QR" readonly required>
 
         <div class="row">
             <div class="col">
@@ -76,7 +64,6 @@
                     <option value="PQS">PQS</option>
                     <option value="CO2">CO2</option>
                     <option value="Agua">Agua</option>
-                    <option value="Agente Limpio">Agente Limpio</option>
                     <option value="K">Clase K</option>
                 </select>
             </div>
@@ -92,19 +79,19 @@
             </div>
         </div>
 
-        <label>Responsable de Inspección</label>
-        <input type="text" id="responsable" placeholder="Nombre completo" required>
+        <label>Responsable</label>
+        <input type="text" id="responsable" required>
 
-        <label>Evidencia de Foto</label>
+        <label>Evidencia de Foto (Baja Res. Auto)</label>
         <input type="file" id="foto" accept="image/*" capture="camera" required>
 
         <div class="checklist-group">
-            <strong>Checklist Normativo STPS:</strong>
+            <strong>Checklist STPS:</strong>
             <div class="check-item"><span>Manómetro en zona verde</span><input type="checkbox" id="c1" checked></div>
-            <div class="check-item"><span>Sello de garantía intacto</span><input type="checkbox" id="c2" checked></div>
+            <div class="check-item"><span>Sello de garantía ok</span><input type="checkbox" id="c2" checked></div>
             <div class="check-item"><span>Manguera y boquilla ok</span><input type="checkbox" id="c3" checked></div>
             <div class="check-item"><span>Señalamiento y altura ok</span><input type="checkbox" id="c4" checked></div>
-            <div class="check-item"><span>Acceso libre obstáculos</span><input type="checkbox" id="c5" checked></div>
+            <div class="check-item"><span>Acceso libre</span><input type="checkbox" id="c5" checked></div>
         </div>
 
         <label>Observaciones</label>
@@ -125,50 +112,68 @@
             </div>
         </div>
 
-        <button type="submit" class="btn-submit" id="btnEnviar">ENVIAR REPORTE OFICIAL</button>
+        <button type="submit" class="btn-submit" id="btnEnviar">ENVIAR REPORTE</button>
     </form>
 </div>
 
 <script>
     let html5QrCode;
 
+    // --- FUNCIÓN MÁGICA: REDUCIR RESOLUCIÓN ---
+    async function compressImage(file) {
+        return new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    let width = img.width;
+                    let height = img.height;
+                    const max_size = 800; // Máximo 800px para que pese poco
+
+                    if (width > height) {
+                        if (width > max_size) { height *= max_size / width; width = max_size; }
+                    } else {
+                        if (height > max_size) { width *= max_size / height; height = max_size; }
+                    }
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+                    resolve(canvas.toDataURL('image/jpeg', 0.7)); // Calidad al 70%
+                };
+            };
+        });
+    }
+
     async function startScanner() {
         document.getElementById('reader').style.display = 'block';
         document.getElementById('btnStartCamera').style.display = 'none';
         document.getElementById('btnStopCamera').style.display = 'flex';
-
         html5QrCode = new Html5Qrcode("reader");
-        const config = { fps: 20, qrbox: { width: 250, height: 250 } };
-
         try {
-            await html5QrCode.start({ facingMode: "environment" }, config, (text) => {
+            await html5QrCode.start({ facingMode: "environment" }, { fps: 20, qrbox: 250 }, (text) => {
                 document.getElementById('extId').value = text;
-                // Feedback táctil y visual
                 window.navigator.vibrate(200);
-                stopScanner(); 
+                stopScanner();
             });
-        } catch (err) {
-            alert("Error de cámara: " + err);
-            stopScanner();
-        }
+        } catch (err) { stopScanner(); }
     }
 
     async function stopScanner() {
-        if (html5QrCode) {
-            await html5QrCode.stop();
-            html5QrCode = null;
-        }
+        if (html5QrCode) { await html5QrCode.stop(); html5QrCode = null; }
         document.getElementById('reader').style.display = 'none';
         document.getElementById('btnStartCamera').style.display = 'flex';
         document.getElementById('btnStopCamera').style.display = 'none';
     }
 
-    // Lógica de Firma
+    // Firma
     const canvas = document.getElementById('sig-canvas');
     const ctx = canvas.getContext('2d');
     let drawing = false;
     canvas.width = canvas.offsetWidth; canvas.height = canvas.offsetHeight;
-    
     canvas.addEventListener('touchstart', (e) => { drawing = true; ctx.beginPath(); });
     canvas.addEventListener('touchmove', (e) => { 
         if(!drawing) return;
@@ -180,46 +185,38 @@
     canvas.addEventListener('touchend', () => drawing = false);
     function clearSig() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
 
-    // Envío de Datos
+    // Envío Optimizado
     document.getElementById('mainForm').addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        // Verificación extra de ID
-        if(document.getElementById('extId').value === "SIN VERIFICAR" || !document.getElementById('extId').value) {
-            alert("DEBE ESCANEAR UN QR PARA PODER ENVIAR");
-            return;
-        }
+        if(!document.getElementById('extId').value) { alert("ESCANEE QR"); return; }
 
         const btn = document.getElementById('btnEnviar');
         btn.disabled = true;
-        btn.innerText = "CERTIFICANDO REGISTRO...";
+        btn.innerText = "COMPRIMIENDO Y ENVIANDO...";
 
         const file = document.getElementById('foto').files[0];
-        const reader = new FileReader();
-        
-        reader.onloadend = async () => {
-            const payload = {
-                id: document.getElementById('extId').value,
-                agente: document.getElementById('tipoAgente').value,
-                capacidad: document.getElementById('capacidad').value + " " + document.getElementById('unidad').value,
-                resp: document.getElementById('responsable').value,
-                obs: document.getElementById('observaciones').value,
-                status: document.getElementById('status').value,
-                firma: canvas.toDataURL('image/png'),
-                foto: reader.result,
-                checks: `P1:${document.getElementById('c1').checked},P2:${document.getElementById('c2').checked},P3:${document.getElementById('c3').checked},P4:${document.getElementById('c4').checked},P5:${document.getElementById('c5').checked}`,
-                timestamp: new Date().toLocaleString()
-            };
+        const fotoComprimida = await compressImage(file); // Llamada a la compresión
 
-            const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw7AJrzavjTkYTw14mKI06qjNEvVPexFFY9J985aH-yNe249B4map5nCjRMi65O1Cro/exec';
-
-            try {
-                await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
-                alert("REGISTRO CERTIFICADO EXITOSAMENTE");
-                location.reload();
-            } catch (err) { alert("Error"); btn.disabled = false; }
+        const payload = {
+            id: document.getElementById('extId').value,
+            agente: document.getElementById('tipoAgente').value,
+            capacidad: document.getElementById('capacidad').value + " " + document.getElementById('unidad').value,
+            resp: document.getElementById('responsable').value,
+            obs: document.getElementById('observaciones').value,
+            status: document.getElementById('status').value,
+            firma: canvas.toDataURL('image/png'),
+            foto: fotoComprimida, // Foto ligera
+            checks: `P1:${document.getElementById('c1').checked},P2:${document.getElementById('c2').checked},P3:${document.getElementById('c3').checked},P4:${document.getElementById('c4').checked},P5:${document.getElementById('c5').checked}`,
+            timestamp: new Date().toLocaleString()
         };
-        reader.readAsDataURL(file);
+
+        const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw7AJrzavjTkYTw14mKI06qjNEvVPexFFY9J985aH-yNe249B4map5nCjRMi65O1Cro/exec';
+
+        try {
+            await fetch(WEB_APP_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify(payload) });
+            alert("REGISTRO EXITOSO (ALTA VELOCIDAD)");
+            location.reload();
+        } catch (err) { alert("Error"); btn.disabled = false; }
     });
 </script>
 </body>
