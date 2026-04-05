@@ -2,119 +2,153 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Scanner Industrial de Extintores</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>NOM-002 Auditor Pro</title>
     <script src="https://unpkg.com/html5-qrcode"></script>
     <style>
-        :root { --rojo-industrial: #d32f2f; --gris-oscuro: #333; }
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
-        .container { width: 100%; max-width: 450px; background: white; padding: 20px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        h2 { color: var(--rojo-industrial); margin-top: 0; text-align: center; }
-        #reader { width: 100%; border-radius: 10px; overflow: hidden; border: 2px solid #ddd; margin-bottom: 20px; }
-        .form-group { display: flex; flex-direction: column; gap: 15px; }
-        label { font-weight: bold; color: var(--gris-oscuro); font-size: 0.9em; }
-        input, select { padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1em; background: #fafafa; }
-        input[readonly] { background: #eee; cursor: not-allowed; }
-        button { background: var(--rojo-industrial); color: white; padding: 15px; border: none; border-radius: 8px; font-weight: bold; font-size: 1.1em; cursor: pointer; transition: background 0.3s; margin-top: 10px; }
-        button:active { background: #b71c1c; transform: scale(0.98); }
-        .footer { margin-top: 20px; font-size: 0.8em; color: #888; text-align: center; }
+        :root { --primary: #b71c1c; --secondary: #455a64; --bg: #f5f7f9; }
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: var(--bg); margin: 0; padding: 10px; color: #333; }
+        .app-container { max-width: 500px; margin: auto; background: white; border-radius: 15px; box-shadow: 0 8px 20px rgba(0,0,0,0.15); overflow: hidden; }
+        header { background: var(--primary); color: white; padding: 15px; text-align: center; font-weight: bold; font-size: 1.2rem; }
+        
+        /* Sección Scanner */
+        #reader { width: 100% !important; border: none !important; background: #000; }
+        #reader__scan_region { background: white; }
+        
+        .form-content { padding: 20px; }
+        label { display: block; margin-top: 15px; font-weight: 700; font-size: 0.85rem; color: var(--secondary); text-transform: uppercase; }
+        input, select, textarea { width: 100%; padding: 12px; margin-top: 5px; border: 1px solid #cfd8dc; border-radius: 8px; box-sizing: border-box; font-size: 16px; }
+        
+        /* Checklist Estilo Industrial */
+        .checklist-group { background: #fff8f1; border: 1px solid #ffe0b2; border-radius: 10px; padding: 15px; margin-top: 15px; }
+        .check-item { display: flex; align-items: center; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee; }
+        .check-item:last-child { border: none; }
+        input[type="checkbox"] { width: 22px; height: 22px; cursor: pointer; accent-color: var(--primary); }
+
+        /* Contenedor de Firma */
+        .signature-container { border: 2px solid #999; background: #fff; border-radius: 8px; margin-top: 10px; position: relative; }
+        #sig-canvas { width: 100%; height: 160px; touch-action: none; cursor: crosshair; }
+        .sig-tools { display: flex; justify-content: flex-end; padding: 5px; background: #f1f1f1; }
+        
+        .btn-submit { background: var(--primary); color: white; border: none; width: 100%; padding: 18px; border-radius: 10px; font-size: 1.1rem; font-weight: bold; margin-top: 25px; cursor: pointer; box-shadow: 0 4px 6px rgba(183, 28, 28, 0.3); }
+        .btn-submit:active { transform: translateY(2px); box-shadow: none; }
     </style>
-    <link rel="manifest" href="manifest.json">
 </head>
 <body>
 
-<div class="container">
-    <h2>Control de Extintores</h2>
+<div class="app-container">
+    <header>SISTEMA DE AUDITORÍA NOM-002</header>
     
     <div id="reader"></div>
 
-    <div class="form-group">
-        <label>ID DEL EXTINTOR (Escanea el código)</label>
-        <input type="text" id="id-extintor" placeholder="Esperando escaneo..." readonly>
+    <form id="mainForm" class="form-content">
+        <label>ID del Extintor</label>
+        <input type="text" id="extId" name="extId" placeholder="Escanee QR para comenzar" readonly required>
 
-        <label>TIPO DE EXTINTOR</label>
-        <select id="tipo">
-            <option value="PQS">PQS (Polvo Químico Seco)</option>
-            <option value="CO2">CO2 (Dióxido de Carbono)</option>
-            <option value="Agua">Agua / Espuma</option>
-            <option value="Tipo K">Tipo K (Cocinas)</option>
+        <label>Responsable (Firma)</label>
+        <input type="text" id="responsable" name="responsable" placeholder="Nombre del inspector" required>
+
+        <label>Evidencia de Foto</label>
+        <input type="file" id="foto" name="foto" accept="image/*" capture="camera" required>
+
+        <div class="checklist-group">
+            <strong>Checklist Normativo STPS:</strong>
+            <div class="check-item"><span>Manómetro en zona verde</span><input type="checkbox" id="c1" checked></div>
+            <div class="check-item"><span>Sello de garantía intacto</span><input type="checkbox" id="c2" checked></div>
+            <div class="check-item"><span>Manguera y boquilla ok</span><input type="checkbox" id="c3" checked></div>
+            <div class="check-item"><span>Señalamiento y altura ok</span><input type="checkbox" id="c4" checked></div>
+            <div class="check-item"><span>Acceso libre obstáculos</span><input type="checkbox" id="c5" checked></div>
+        </div>
+
+        <label>Estado Final</label>
+        <select id="status" name="status">
+            <option value="Aprobado">✅ Aprobado / Operativo</option>
+            <option value="Observación">⚠️ Observación Menor</option>
+            <option value="Rechazado">❌ Rechazado (Fuera de norma)</option>
         </select>
 
-        <label>ESTADO FÍSICO</label>
-        <select id="estado">
-            <option value="Operativo">🟢 OPERATIVO</option>
-            <option value="Mantenimiento">🟡 MANTENIMIENTO</option>
-            <option value="Vencido">🔴 VENCIDO / RECARGA</option>
-            <option value="Dañado">⚠️ DAÑADO / SIN PRESIÓN</option>
-        </select>
+        <label>Firma Autógrafa</label>
+        <div class="signature-container">
+            <canvas id="sig-canvas"></canvas>
+            <div class="sig-tools">
+                <button type="button" onclick="clearSig()" style="font-size:11px; padding:4px 8px;">BORRAR FIRMA</button>
+            </div>
+        </div>
 
-        <button onclick="enviarDatos()">REGISTRAR INSPECCIÓN</button>
-    </div>
-    
-    <div class="footer">Sistema de Gestión Industrial v1.0</div>
+        <button type="submit" class="btn-submit" id="btnEnviar">REGISTRAR INSPECCIÓN</button>
+    </form>
 </div>
 
 <script>
-    // 1. Configurar y arrancar el escáner
-    const html5QrcodeScanner = new Html5QrcodeScanner(
-        "reader", { fps: 15, qrbox: {width: 250, height: 250} }
-    );
+    // 1. Configuración del Scanner
+    const scanner = new Html5QrcodeScanner("reader", { fps: 15, qrbox: 250 });
+    scanner.render((text) => {
+        document.getElementById('extId').value = text;
+        window.navigator.vibrate(100);
+    });
 
-    html5QrcodeScanner.render(onScanSuccess);
+    // 2. Lógica de Firma
+    const canvas = document.getElementById('sig-canvas');
+    const ctx = canvas.getContext('2d');
+    let drawing = false;
 
-    function onScanSuccess(decodedText, decodedResult) {
-        document.getElementById('id-extintor').value = decodedText;
-        // Sonido o vibración de éxito (opcional)
-        if (navigator.vibrate) navigator.vibrate(100);
+    // Ajustar resolución del canvas
+    canvas.width = canvas.offsetWidth;
+    canvas.height = canvas.offsetHeight;
+
+    function getMousePos(e) {
+        const rect = canvas.getBoundingClientRect();
+        const clientX = e.clientX || e.touches[0].clientX;
+        const clientY = e.clientY || e.touches[0].clientY;
+        return { x: clientX - rect.left, y: clientY - rect.top };
     }
 
-    // 2. Función para mandar los datos a Google Sheets
-    async function enviarDatos() {
-        const id = document.getElementById('id-extintor').value;
-        const tipo = document.getElementById('tipo').value;
-        const estado = document.getElementById('estado').value;
+    canvas.addEventListener('touchstart', (e) => { drawing = true; ctx.beginPath(); const pos = getMousePos(e); ctx.moveTo(pos.x, pos.y); e.preventDefault(); });
+    canvas.addEventListener('touchmove', (e) => { if(!drawing) return; const pos = getMousePos(e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); e.preventDefault(); });
+    canvas.addEventListener('touchend', () => drawing = false);
+    
+    function clearSig() { ctx.clearRect(0, 0, canvas.width, canvas.height); }
+
+    // 3. Envío de Datos (Conversión a Base64 para Foto y Firma)
+    document.getElementById('mainForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = document.getElementById('btnEnviar');
+        btn.disabled = true;
+        btn.innerText = "PROCESANDO AUDITORÍA...";
+
+        const file = document.getElementById('foto').files[0];
+        const reader = new FileReader();
         
-        // --- PEGA AQUÍ TU URL DE GOOGLE APPS SCRIPT ---
-        const urlScript = "https://script.google.com/macros/s/AKfycbzXcbkGup0KtRuZRmMo3-TbzJh5vQiX0XKlnmQYJ26qmuvLun_6IxRnhOGGm8RdrVCv/exec"; 
+        reader.onloadend = async () => {
+            const payload = {
+                id: document.getElementById('extId').value,
+                resp: document.getElementById('responsable').value,
+                status: document.getElementById('status').value,
+                firma: canvas.toDataURL('image/png'),
+                foto: reader.result,
+                checks: `P1:${document.getElementById('c1').checked},P2:${document.getElementById('c2').checked},P3:${document.getElementById('c3').checked},P4:${document.getElementById('c4').checked},P5:${document.getElementById('c5').checked}`,
+                timestamp: new Date().toLocaleString()
+            };
 
-        if (!id) {
-            alert("Por favor, escanea primero el código QR del extintor.");
-            return;
-        }
+            // AQUÍ PEGAS TU URL DE GOOGLE APPS SCRIPT
+            const WEB_APP_URL = 'https://script.google.com/macros/s/AKfycbw7AJrzavjTkYTw14mKI06qjNEvVPexFFY9J985aH-yNe249B4map5nCjRMi65O1Cro/exec';
 
-        const datos = {
-            id: id,
-            tipo: tipo,
-            estado: estado
+            try {
+                await fetch(WEB_APP_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify(payload)
+                });
+                alert("REGISTRO DE AUDITORÍA GUARDADO CORRECTAMENTE");
+                location.reload();
+            } catch (err) {
+                alert("Error de conexión. Intente de nuevo.");
+                btn.disabled = false;
+            }
         };
-
-        try {
-            // Cambiamos el texto del botón mientras envía
-            const btn = document.querySelector('button');
-            const originalText = btn.innerText;
-            btn.innerText = "ENVIANDO...";
-            btn.disabled = true;
-
-            await fetch(urlScript, {
-                method: "POST",
-                mode: "no-cors", 
-                body: JSON.stringify(datos)
-            });
-
-            alert("✅ Registro guardado en la nube.");
-            
-            // Limpiar formulario para el siguiente
-            document.getElementById('id-extintor').value = "";
-            btn.innerText = originalText;
-            btn.disabled = false;
-
-        } catch (error) {
-            alert("❌ Error de conexión: " + error);
-        }
-    }
+        reader.readAsDataURL(file);
+    });
 </script>
 
 </body>
 </html>
-
-         
